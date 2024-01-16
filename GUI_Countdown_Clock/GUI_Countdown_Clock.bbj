@@ -3,7 +3,7 @@ title$ = "Coundown Timer"
 sysgui = unt
 
 open (sysgui)"X0"
-
+bbj! = BBjAPI()
 sysgui! = bbjapi().getSysGui()
 
 window! = sysgui!.addWindow(50,50,700,350,title$)
@@ -13,15 +13,23 @@ window!.setCallback(window!.ON_CLOSE,"eoj")
 window!.setBackColor(sysgui!.makeColor(209, 255, 245))
 
 rem ----------------------------------------------------------------------- 'fonts'
-headerFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_BOLD)
+colonFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_BOLD)
 inputFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_PLAIN)
-buttonFont! = sysgui!.makeFont("Arial", 18, BBjFont.FONT_PLAIN)
+buttonFont! = sysgui!.makeFont("Arial", 13, BBjFont.FONT_PLAIN)
+headerFont! = sysgui!.makeFont("Arial", 13, BBjFont.FONT_BOLD)
+
+
+rem ----------------------------------------------------------------------- 'colors'
+startButtonColor! = sysgui!.makeColor(192, 245, 140)
+startButtonHoverColor! = sysgui!.makeColor(157, 199, 115)
+stopButtonColor! = sysgui!.makeColor(245, 151, 108)
+stopButtonHoverColor! = sysgui!.makeColor(212, 126, 87)
 
 
 rem ----------------------------------------------------------------------- 'inputs'
-hoursInput! = window!.addInputN(1, 175, 100, 100, 50, $0000$, "00")
-minutesInput! = window!.addInputN(2, 307, 100, 100, 50, $0000$, "00")
-secondsInput! = window!.addInputN(3, 437.5, 100, 100, 50, $0000$, "00")
+hoursInput! = window!.addInputN(1, 175, 100, 100, 50, $0020$, "00")
+minutesInput! = window!.addInputN(2, 307, 100, 100, 50, $0020$, "00")
+secondsInput! = window!.addInputN(3, 437.5, 100, 100, 50, $0020$, "00")
 
 rem 'input - alignment'
 hoursInput!.setAlignment(hoursInput!.ALIGN_CENTER)
@@ -33,11 +41,15 @@ hoursInput!.setFont(inputFont!)
 minutesInput!.setFont(inputFont!)
 secondsInput!.setFont(inputFont!)
 
-
 rem ----------------------------------------------------------------------- 'buttons'
-startButton! = window!.addButton(4,175,180,100,50,"Start",$$)
-stopButton! = window!.addButton(5,437.5,180,100,50,"Stop",$$)
-resetButton! = window!.addButton(6,600,0,100,50,"Reset",$$)
+startButton! = window!.addButton(4,175,180,100,50,"START",$$)
+stopButton! = window!.addButton(5,437.5,180,100,50,"STOP",$$)
+resetButton! = window!.addButton(6,600,0,100,50,"RESET",$$)
+
+startButton!.setCallback(startButton!.ON_MOUSE_ENTER, "startHover")
+startButton!.setCallback(startButton!.ON_MOUSE_EXIT, "startExitHover")
+stopButton!.setCallback(stopButton!.ON_MOUSE_ENTER, "stopHover")
+stopButton!.setCallback(stopButton!.ON_MOUSE_EXIT, "stopExitHover")
 
 startButton!.setCallback(startButton!.ON_BUTTON_PUSH, "startTimer")
 stopButton!.setCallback(stopButton!.ON_BUTTON_PUSH, "stopTimer")
@@ -47,36 +59,94 @@ startButton!.setFont(buttonFont!)
 stopButton!.setFont(buttonFont!)
 resetButton!.setFont(buttonFont!)
 
+startButton!.setNoEdge(1)
+stopButton!.setNoEdge(1)
+
+startButton!.setBackColor(startButtonColor!)
+stopButton!.setBackColor(stopButtonColor!)
+resetButton!.setOpaque(0)
+
 
 rem ----------------------------------------------------------------------- 'static text'
 colon1! = window!.addStaticText(7, 286, 103, 10, 50, ":")
 colon2! = window!.addStaticText(8, 418, 103, 10, 50, ":")
 
+colon1!.setFont(colonFont!)
+colon2!.setFont(colonFont!)
 
-colon1!.setFont(headerFont!)
-colon2!.setFont(headerFont!)
+hoursHeader! = window!.addStaticText(9, 200, 80, 100, 50, "Hours")
+minutesHeader! = window!.addStaticText(10, 325, 80, 100, 50, "Minutes")
+secondsHeader! = window!.addStaticText(11, 450, 80, 100, 50, "Seconds")
+
+hoursHeader!.setFont(headerFont!)
+minutesHeader!.setFont(headerFont!)
+secondsHeader!.setFont(headerFont!)
+
+
+times% = 0
 
 process_events
 
-
-
 rem ----------------------------------------------------------------------- 'callback functions'
+startHover:
+    startButton!.setBackColor(startButtonHoverColor!)
+return
+
+startExitHover:
+    startButton!.setBackColor(startButtonColor!)
+return
+
+stopHover:
+    stopButton!.setBackColor(stopButtonHoverColor!)
+return
+
+stopExitHover:
+    stopButton!.setBackColor(stopButtonColor!)
+return
+
 startTimer:
-    i = msgBox("you started the timer")
+    hours! = hoursInput!.getValue()
+    minutes! = minutesInput!.getValue()
+    seconds! = secondsInput!.getValue()
+    
+    if (hours! > 0) OR (minutes! > 0) OR (seconds! > 0) then
+        bbj!.createTimer(oneSecTimer, 1, "calculateTime")
+    else
+        noInputMessage! = msgBox("Please enter your desired time")
+    endif
     
 return
 
 stopTimer:
-    i = msgBox("you stopped the timer")
+    bbj!.removeTimer(oneSecTimer)
+    print "timer stopped"
     
 return
 
 resetTimer:
-    i = msgBox("you reset the timer")
+    resetBox! = msgBox("Are you sure you want to reset your timer?", 4, "Reset timer")
+    
+    rem return of 6 - YES
+    if (resetBox! = 6) then yes = msgBox("you clicked yes")
+    rem return of 7 - NO
+    if (resetBox! = 7) then no = msgBox("you clicked no")
     
 return
+
+calculateTime:
+    hours% = hoursInput!.getValue()
+    minutes% = minutesInput!.getValue()
+    seconds% = secondsInput!.getValue()
+    
+    hoursToMS% = hours% * 3600000
+    minutesToMS% = minutes% * 60000
+    secondsToMS% = seconds% * 1000
+    
+return
+
 
 
 eoj:
 
 release
+
