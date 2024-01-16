@@ -4,13 +4,16 @@ sysgui = unt
 
 open (sysgui)"X0"
 bbj! = BBjAPI()
-sysgui! = bbjapi().getSysGui()
+sysgui! = bbj!.getSysGui()
+title$ = "GUI Countdown Timer"
 
 window! = sysgui!.addWindow(50,50,700,350,title$)
 
 window!.setCallback(window!.ON_CLOSE,"eoj")
 
 window!.setBackColor(sysgui!.makeColor(209, 255, 245))
+
+
 
 rem ----------------------------------------------------------------------- 'fonts'
 colonFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_BOLD)
@@ -27,9 +30,11 @@ stopButtonHoverColor! = sysgui!.makeColor(212, 126, 87)
 
 
 rem ----------------------------------------------------------------------- 'inputs'
-hoursInput! = window!.addInputN(1, 175, 100, 100, 50, $0020$, "00")
+hoursInput! = window!.addInputN(1, 175, 100, 100, 50, $0800$, "00")
 minutesInput! = window!.addInputN(2, 307, 100, 100, 50, $0020$, "00")
 secondsInput! = window!.addInputN(3, 437.5, 100, 100, 50, $0020$, "00")
+
+hoursInput!.focus()
 
 rem 'input - alignment'
 hoursInput!.setAlignment(hoursInput!.ALIGN_CENTER)
@@ -45,6 +50,8 @@ rem ----------------------------------------------------------------------- 'but
 startButton! = window!.addButton(4,175,180,100,50,"START",$$)
 stopButton! = window!.addButton(5,437.5,180,100,50,"STOP",$$)
 resetButton! = window!.addButton(6,600,0,100,50,"RESET",$$)
+
+stopButton!.setEnabled(0)
 
 startButton!.setCallback(startButton!.ON_MOUSE_ENTER, "startHover")
 startButton!.setCallback(startButton!.ON_MOUSE_EXIT, "startExitHover")
@@ -82,8 +89,52 @@ hoursHeader!.setFont(headerFont!)
 minutesHeader!.setFont(headerFont!)
 secondsHeader!.setFont(headerFont!)
 
+startTime! = 0
 
-times% = 0
+
+rem ----------------------------------------------------------------------- 'user functions'
+DEF FNConvertTime% (timeRemaining%)
+      
+      timeRemaining% = timeRemaining% - 1000
+      currentTime% = currentTime% + 1000
+      
+      seconds% = INT(timeRemaining% / 1000)
+      minutes% = INT(seconds% / 60)
+      hoursRemaining% = INT(minutes% / 60)
+      
+      if seconds% >= 60 then 
+          secondsRemaining% = MOD(seconds%, 60)
+      else
+          secondsRemaining% = seconds%
+      endif
+      
+      if minutes% >= 60 then 
+          minutesRemaining% = MOD(minutes%, 60)
+      else
+          minutesRemaining% = minutes%
+      endif
+      
+      hoursInput!.setValue(hoursRemaining%)
+      minutesInput!.setValue(minutesRemaining%)
+      secondsInput!.setValue(secondsRemaining%)
+      
+      if (secondsRemaining% = 0) AND (minutesRemaining% = 0) AND (hoursRemaining% = 0) then 
+          sysgui = unt
+          open (sysgui)"X0"
+          sysgui! = bbjapi().getSysGui()
+          sysgui!.beep()
+          timesUpMessage! = msgBox("Time's Up!")
+          bbj!.removeTimer(oneSecTimer)
+          hoursInput!.setValue(00)
+          minutesInput!.setValue(00)
+          secondsInput!.setValue(00)
+          startTime! = 0
+          stopButton!.setEnabled(0)
+      endif
+      
+      RETURN timeRemaining%
+ FNEND
+
 
 process_events
 
@@ -110,6 +161,7 @@ startTimer:
     seconds! = secondsInput!.getValue()
     
     if (hours! > 0) OR (minutes! > 0) OR (seconds! > 0) then
+        if (startTime! = 0) then startTime! = TIM
         bbj!.createTimer(oneSecTimer, 1, "calculateTime")
     else
         noInputMessage! = msgBox("Please enter your desired time")
@@ -119,7 +171,8 @@ return
 
 stopTimer:
     bbj!.removeTimer(oneSecTimer)
-    print "timer stopped"
+    startButton!.setEnabled(1)
+    stopButton!.setEnabled(0)
     
 return
 
@@ -134,6 +187,9 @@ resetTimer:
 return
 
 calculateTime:
+    stopButton!.setEnabled(1)
+    startButton!.setEnabled(0)
+    
     hours% = hoursInput!.getValue()
     minutes% = minutesInput!.getValue()
     seconds% = secondsInput!.getValue()
@@ -142,6 +198,13 @@ calculateTime:
     minutesToMS% = minutes% * 60000
     secondsToMS% = seconds% * 1000
     
+    totalTime% = hoursToMS% + minutesToMS% + secondsToMS%
+    timeRemaining% = totalTime%
+    currentTime% = startTime! * 3600000
+    futureTime% = totalTime% + currentTime%
+    
+    calculateTime! = FNConvertTime%(timeRemaining%)
+    
 return
 
 
@@ -149,4 +212,3 @@ return
 eoj:
 
 release
-
