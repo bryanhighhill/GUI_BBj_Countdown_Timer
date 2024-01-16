@@ -1,0 +1,82 @@
+title$ = "Coundown Timer"
+
+sysgui = unt
+
+open (sysgui)"X0"
+
+sysgui! = bbjapi().getSysGui()
+
+window! = sysgui!.addWindow(50,50,700,350,title$)
+
+window!.setCallback(window!.ON_CLOSE,"eoj")
+
+window!.setBackColor(sysgui!.makeColor(209, 255, 245))
+
+rem ----------------------------------------------------------------------- 'fonts'
+headerFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_BOLD)
+inputFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_PLAIN)
+buttonFont! = sysgui!.makeFont("Arial", 18, BBjFont.FONT_PLAIN)
+
+
+rem ----------------------------------------------------------------------- 'inputs'
+hoursInput! = window!.addInputN(1, 175, 100, 100, 50, $0000$, "00")
+minutesInput! = window!.addInputN(2, 307, 100, 100, 50, $0000$, "00")
+secondsInput! = window!.addInputN(3, 437.5, 100, 100, 50, $0000$, "00")
+
+rem 'input - alignment'
+hoursInput!.setAlignment(hoursInput!.ALIGN_CENTER)
+minutesInput!.setAlignment(minutesInput!.ALIGN_CENTER)
+secondsInput!.setAlignment(secondsInput!.ALIGN_CENTER)
+
+rem 'input - font'
+hoursInput!.setFont(inputFont!)
+minutesInput!.setFont(inputFont!)
+secondsInput!.setFont(inputFont!)
+
+
+rem ----------------------------------------------------------------------- 'buttons'
+startButton! = window!.addButton(4,175,180,100,50,"Start",$$)
+stopButton! = window!.addButton(5,437.5,180,100,50,"Stop",$$)
+resetButton! = window!.addButton(6,600,0,100,50,"Reset",$$)
+
+startButton!.setCallback(startButton!.ON_BUTTON_PUSH, "startTimer")
+stopButton!.setCallback(stopButton!.ON_BUTTON_PUSH, "stopTimer")
+resetButton!.setCallback(resetButton!.ON_BUTTON_PUSH, "resetTimer")
+
+startButton!.setFont(buttonFont!)
+stopButton!.setFont(buttonFont!)
+resetButton!.setFont(buttonFont!)
+
+
+rem ----------------------------------------------------------------------- 'static text'
+colon1! = window!.addStaticText(7, 286, 103, 10, 50, ":")
+colon2! = window!.addStaticText(8, 418, 103, 10, 50, ":")
+
+
+colon1!.setFont(headerFont!)
+colon2!.setFont(headerFont!)
+
+process_events
+
+
+
+rem ----------------------------------------------------------------------- 'callback functions'
+startTimer:
+    i = msgBox("you started the timer")
+    
+return
+
+stopTimer:
+    i = msgBox("you stopped the timer")
+    
+return
+
+resetTimer:
+    i = msgBox("you reset the timer")
+    
+return
+
+
+eoj:
+
+release
