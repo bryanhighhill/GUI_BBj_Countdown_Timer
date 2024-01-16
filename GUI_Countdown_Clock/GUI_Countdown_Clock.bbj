@@ -156,6 +156,10 @@ stopExitHover:
 return
 
 startTimer:
+    hoursInput!.setEditable(0)
+    minutesInput!.setEditable(0)
+    secondsInput!.setEditable(0)
+    
     hours! = hoursInput!.getValue()
     minutes! = minutesInput!.getValue()
     seconds! = secondsInput!.getValue()
@@ -173,16 +177,45 @@ stopTimer:
     bbj!.removeTimer(oneSecTimer)
     startButton!.setEnabled(1)
     stopButton!.setEnabled(0)
+    hoursInput!.setEditable(1)
+    minutesInput!.setEditable(1)
+    secondsInput!.setEditable(1)
     
 return
 
 resetTimer:
-    resetBox! = msgBox("Are you sure you want to reset your timer?", 4, "Reset timer")
+    hours! = hoursInput!.getValue()
+    minutes! = minutesInput!.getValue()
+    seconds! = secondsInput!.getValue()
     
-    rem return of 6 - YES
-    if (resetBox! = 6) then yes = msgBox("you clicked yes")
-    rem return of 7 - NO
-    if (resetBox! = 7) then no = msgBox("you clicked no")
+    if (hours! = 0) AND (minutes! = 0) AND (seconds! = 0) then 
+        noInputMessage! = msgBox("Please enter your desired time")
+    else
+        resetBox! = msgBox("Are you sure you want to reset your timer?", 4, "Reset timer")
+    
+        rem return of 6 - YES
+        if (resetBox! = 6) then 
+            if (stopButton!.isEnabled() = 1) then 
+                bbj!.removeTimer(oneSecTimer)
+            endif
+            if (startButton!.isEnabled() = 0) then startButton!.setEnabled(1)
+            hoursInput!.setValue(00)
+            minutesInput!.setValue(00)
+            secondsInput!.setValue(00)
+            startTime! = 0
+            stopButton!.setEnabled(0)
+            hoursInput!.setEditable(1)
+            minutesInput!.setEditable(1)
+            secondsInput!.setEditable(1)
+        endif
+    
+        rem return of 7 - NO
+        if (resetBox! = 7) then
+            hoursInput!.setValue(hours!)
+            minutesInput!.setValue(minutes!)
+            secondsInput!.setValue(seconds!)
+        endif
+    endif
     
 return
 
