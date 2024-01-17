@@ -27,6 +27,7 @@ startButtonColor! = sysgui!.makeColor(192, 245, 140)
 startButtonHoverColor! = sysgui!.makeColor(157, 199, 115)
 stopButtonColor! = sysgui!.makeColor(245, 151, 108)
 stopButtonHoverColor! = sysgui!.makeColor(212, 126, 87)
+inputBGColor! = sysgui!.makeColor(255, 255, 255)
 
 
 rem ----------------------------------------------------------------------- 'inputs'
@@ -118,6 +119,10 @@ DEF FNConvertTime% (timeRemaining%)
       minutesInput!.setValue(minutesRemaining%)
       secondsInput!.setValue(secondsRemaining%)
       
+      if (secondsRemaining% <= 10) AND (minutesRemaining% = 0) AND (hoursRemaining% = 0) then
+          secondsInput!.setBackColor(stopButtonColor!)
+      endif
+      
       if (secondsRemaining% = 0) AND (minutesRemaining% = 0) AND (hoursRemaining% = 0) then 
           sysgui = unt
           open (sysgui)"X0"
@@ -130,6 +135,11 @@ DEF FNConvertTime% (timeRemaining%)
           secondsInput!.setValue(00)
           startTime! = 0
           stopButton!.setEnabled(0)
+          hoursInput!.setEditable(1)
+          minutesInput!.setEditable(1)
+          secondsInput!.setEditable(1)
+          startButton!.setEnabled(1)
+          secondsInput!.setBackColor(inputBGColor!)
       endif
       
       RETURN timeRemaining%
