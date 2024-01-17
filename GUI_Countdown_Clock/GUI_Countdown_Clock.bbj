@@ -1,3 +1,6 @@
+REM  ' this program is a countdown timer. It takes user input for hours, minutes, and seconds. 
+REM Upon pressing start, the app will display how much time is left and update every second'
+
 title$ = "Coundown Timer"
 
 sysgui = unt
@@ -12,8 +15,6 @@ window! = sysgui!.addWindow(50,50,700,350,title$)
 window!.setCallback(window!.ON_CLOSE,"eoj")
 
 window!.setBackColor(sysgui!.makeColor(209, 255, 245))
-
-
 
 rem ----------------------------------------------------------------------- 'fonts'
 colonFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_BOLD)
@@ -94,55 +95,54 @@ startTime! = 0
 
 
 rem ----------------------------------------------------------------------- 'user functions'
-DEF FNConvertTime% (timeRemaining%)
+DEF FNConvertTime% (timeRemaining%)    
+    timeRemaining% = timeRemaining% - 1000
+    currentTime% = currentTime% + 1000
       
-      timeRemaining% = timeRemaining% - 1000
-      currentTime% = currentTime% + 1000
+    seconds% = INT(timeRemaining% / 1000)
+    minutes% = INT(seconds% / 60)
+    hoursRemaining% = INT(minutes% / 60)
       
-      seconds% = INT(timeRemaining% / 1000)
-      minutes% = INT(seconds% / 60)
-      hoursRemaining% = INT(minutes% / 60)
+    if seconds% >= 60 then 
+        secondsRemaining% = MOD(seconds%, 60)
+    else
+        secondsRemaining% = seconds%
+    endif
       
-      if seconds% >= 60 then 
-          secondsRemaining% = MOD(seconds%, 60)
-      else
-          secondsRemaining% = seconds%
-      endif
+    if minutes% >= 60 then 
+        minutesRemaining% = MOD(minutes%, 60)
+    else
+        minutesRemaining% = minutes%
+    endif
       
-      if minutes% >= 60 then 
-          minutesRemaining% = MOD(minutes%, 60)
-      else
-          minutesRemaining% = minutes%
-      endif
+    hoursInput!.setValue(hoursRemaining%)
+    minutesInput!.setValue(minutesRemaining%)
+    secondsInput!.setValue(secondsRemaining%)
       
-      hoursInput!.setValue(hoursRemaining%)
-      minutesInput!.setValue(minutesRemaining%)
-      secondsInput!.setValue(secondsRemaining%)
+    if (secondsRemaining% <= 10) AND (minutesRemaining% = 0) AND (hoursRemaining% = 0) then
+        secondsInput!.setBackColor(stopButtonColor!)
+    endif
       
-      if (secondsRemaining% <= 10) AND (minutesRemaining% = 0) AND (hoursRemaining% = 0) then
-          secondsInput!.setBackColor(stopButtonColor!)
-      endif
+    if (secondsRemaining% = 0) AND (minutesRemaining% = 0) AND (hoursRemaining% = 0) then 
+        sysgui = unt
+        open (sysgui)"X0"
+        sysgui! = bbjapi().getSysGui()
+        sysgui!.beep()
+        timesUpMessage! = msgBox("Time's Up!")
+        bbj!.removeTimer(oneSecTimer)
+        hoursInput!.setValue(00)
+        minutesInput!.setValue(00)
+        secondsInput!.setValue(00)
+        startTime! = 0
+        stopButton!.setEnabled(0)
+        startButton!.setEnabled(1)
+        hoursInput!.setEditable(1)
+        minutesInput!.setEditable(1)
+        secondsInput!.setEditable(1)
+        secondsInput!.setBackColor(inputBGColor!)
+    endif
       
-      if (secondsRemaining% = 0) AND (minutesRemaining% = 0) AND (hoursRemaining% = 0) then 
-          sysgui = unt
-          open (sysgui)"X0"
-          sysgui! = bbjapi().getSysGui()
-          sysgui!.beep()
-          timesUpMessage! = msgBox("Time's Up!")
-          bbj!.removeTimer(oneSecTimer)
-          hoursInput!.setValue(00)
-          minutesInput!.setValue(00)
-          secondsInput!.setValue(00)
-          startTime! = 0
-          stopButton!.setEnabled(0)
-          hoursInput!.setEditable(1)
-          minutesInput!.setEditable(1)
-          secondsInput!.setEditable(1)
-          startButton!.setEnabled(1)
-          secondsInput!.setBackColor(inputBGColor!)
-      endif
-      
-      RETURN timeRemaining%
+    RETURN timeRemaining%
  FNEND
 
 
@@ -176,7 +176,6 @@ startTimer:
     else
         noInputMessage! = msgBox("Please enter your desired time")
     endif
-    
 return
 
 stopTimer:
@@ -201,9 +200,7 @@ resetTimer:
     
         rem return of 6 - YES
         if (resetBox! = 6) then 
-            if (stopButton!.isEnabled() = 1) then 
-                bbj!.removeTimer(oneSecTimer)
-            endif
+            if (stopButton!.isEnabled() = 1) then bbj!.removeTimer(oneSecTimer)
             if (startButton!.isEnabled() = 0) then startButton!.setEnabled(1)
             hoursInput!.setValue(00)
             minutesInput!.setValue(00)
@@ -222,7 +219,6 @@ resetTimer:
             secondsInput!.setValue(seconds!)
         endif
     endif
-    
 return
 
 calculateTime:
@@ -247,7 +243,6 @@ calculateTime:
     futureTime% = totalTime% + currentTime%
     
     calculateTime! = FNConvertTime%(timeRemaining%)
-    
 return
 
 eoj:
