@@ -22,14 +22,12 @@ inputFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_PLAIN)
 buttonFont! = sysgui!.makeFont("Arial", 13, BBjFont.FONT_PLAIN)
 headerFont! = sysgui!.makeFont("Arial", 13, BBjFont.FONT_BOLD)
 
-
 rem ----------------------------------------------------------------------- 'colors'
 startButtonColor! = sysgui!.makeColor(192, 245, 140)
 startButtonHoverColor! = sysgui!.makeColor(157, 199, 115)
 stopButtonColor! = sysgui!.makeColor(245, 151, 108)
 stopButtonHoverColor! = sysgui!.makeColor(212, 126, 87)
 inputBGColor! = sysgui!.makeColor(255, 255, 255)
-
 
 rem ----------------------------------------------------------------------- 'inputs'
 hoursInput! = window!.addInputN(1, 175, 100, 100, 50, $0800$, "00")
@@ -75,7 +73,6 @@ startButton!.setBackColor(startButtonColor!)
 stopButton!.setBackColor(stopButtonColor!)
 resetButton!.setOpaque(0)
 
-
 rem ----------------------------------------------------------------------- 'static text'
 colon1! = window!.addStaticText(7, 286, 103, 10, 50, ":")
 colon2! = window!.addStaticText(8, 418, 103, 10, 50, ":")
@@ -92,7 +89,6 @@ minutesHeader!.setFont(headerFont!)
 secondsHeader!.setFont(headerFont!)
 
 startTime! = 0
-
 
 rem ----------------------------------------------------------------------- 'user functions'
 DEF FNConvertTime% (timeRemaining%)    
@@ -145,7 +141,6 @@ DEF FNConvertTime% (timeRemaining%)
     RETURN timeRemaining%
  FNEND
 
-
 process_events
 
 rem ----------------------------------------------------------------------- 'callback functions'
@@ -184,8 +179,7 @@ stopTimer:
     stopButton!.setEnabled(0)
     hoursInput!.setEditable(1)
     minutesInput!.setEditable(1)
-    secondsInput!.setEditable(1)
-    
+    secondsInput!.setEditable(1) 
 return
 
 resetTimer:
