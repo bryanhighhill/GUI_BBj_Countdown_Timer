@@ -156,10 +156,6 @@ stopExitHover:
 return
 
 startTimer:
-    hoursInput!.setEditable(0)
-    minutesInput!.setEditable(0)
-    secondsInput!.setEditable(0)
-    
     hours! = hoursInput!.getValue()
     minutes! = minutesInput!.getValue()
     seconds! = secondsInput!.getValue()
@@ -220,6 +216,10 @@ resetTimer:
 return
 
 calculateTime:
+    hoursInput!.setEditable(0)
+    minutesInput!.setEditable(0)
+    secondsInput!.setEditable(0)
+    
     stopButton!.setEnabled(1)
     startButton!.setEnabled(0)
     
@@ -241,5 +241,4 @@ calculateTime:
 return
 
 eoj:
-
 release
