@@ -63,8 +63,6 @@ REM hoursInputSpinner! = window!.addInputNSpinner(12, 175, 100, 100, 50, $0004$,
 minutesInput! = window!.addInputN(5, 307, 100, 100, 50, $0004$, "00")
 secondsInput! = window!.addInputN(6, 437.5, 100, 100, 50, $0004$, "00")
 
-REM hoursInput!.focus()
-
 rem 'input - alignment'
 hoursInput!.setAlignment(hoursInput!.ALIGN_CENTER)
 REM hoursInputSpinner!.setAlignment(hoursInputSpinner!.ALIGN_CENTER)
@@ -113,17 +111,14 @@ if (tc!.getUserProperty("userProperties") = "yes") then
     previousSeconds$ = tc!.getUserProperty("secondsRemaining!")
     
     if (NUM(previousHours$) > 0) then 
-        print "previous hours: ", previousHours$
         hoursInput!.setValue(NUM(previousHours$))
     endif
     
     if (NUM(previousMinutes$) > 0) then
-        print "previous minutes: ", previousMinutes%
         minutesInput!.setValue(NUM(previousMinutes$))
     endif
     
     if (NUM(previousSeconds$) > 0) then 
-    print "previous seconds: ", previousSeconds$
         secondsInput!.setValue(NUM(previousSeconds$))
     endif
 endif
