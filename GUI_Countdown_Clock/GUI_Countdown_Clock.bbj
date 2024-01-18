@@ -1,23 +1,25 @@
 REM  ' this program is a countdown timer. It takes user input for hours, minutes, and seconds. 
 REM Upon pressing start, the app will display how much time is left and update every second'
 
-title$ = "Coundown Timer"
+seterr ERR_HANDLER_NO_USER_PROPERTIES
 
 sysgui = unt
 
 open (sysgui)"X0"
 bbj! = BBjAPI()
 sysgui! = bbj!.getSysGui()
+tc! = bbj!.getThinClient()
+
 title$ = "GUI Countdown Timer"
 
-window! = sysgui!.addWindow(50,50,700,350,title$)
+window! = sysgui!.addWindow(50,50,700,350,title$, $00010000$)
 
 window!.setCallback(window!.ON_CLOSE,"eoj")
 
 window!.setBackColor(sysgui!.makeColor(209, 255, 245))
 
 rem ----------------------------------------------------------------------- 'fonts'
-colonFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_BOLD)
+colonFont! = sysgui!.makeFont("Arial", 20, BBjFont.FONT_BOLD)
 inputFont! = sysgui!.makeFont("Arial", 24, BBjFont.FONT_PLAIN)
 buttonFont! = sysgui!.makeFont("Arial", 13, BBjFont.FONT_PLAIN)
 headerFont! = sysgui!.makeFont("Arial", 13, BBjFont.FONT_BOLD)
@@ -29,27 +31,56 @@ stopButtonColor! = sysgui!.makeColor(245, 151, 108)
 stopButtonHoverColor! = sysgui!.makeColor(212, 126, 87)
 inputBGColor! = sysgui!.makeColor(255, 255, 255)
 
-rem ----------------------------------------------------------------------- 'inputs'
-hoursInput! = window!.addInputN(1, 175, 100, 100, 50, $0800$, "00")
-minutesInput! = window!.addInputN(2, 307, 100, 100, 50, $0020$, "00")
-secondsInput! = window!.addInputN(3, 437.5, 100, 100, 50, $0020$, "00")
+rem ----------------------------------------------------------------------- 'static text'
+colon1! = window!.addStaticText(7, 286, 103, 10, 50, ":")
+colon2! = window!.addStaticText(8, 418, 103, 10, 50, ":")
 
-hoursInput!.focus()
+colon1!.setFont(colonFont!)
+colon2!.setFont(colonFont!)
+
+hoursHeader! = window!.addStaticText(9, 200, 80, 100, 50, "Hours")
+minutesHeader! = window!.addStaticText(10, 325, 80, 100, 50, "Minutes")
+secondsHeader! = window!.addStaticText(11, 450, 80, 100, 50, "Seconds")
+
+hoursHeader!.setFont(headerFont!)
+minutesHeader!.setFont(headerFont!)
+secondsHeader!.setFont(headerFont!)
+
+colon1!.setOpaque(0)
+colon2!.setOpaque(0)
+
+hoursHeader!.setOpaque(0)
+minutesHeader!.setOpaque(0)
+secondsHeader!.setOpaque(0)
+
+hoursHeader!.addStyle("pointer-events: none;")
+minutesHeader!.addStyle("pointer-events: none;")
+secondsHeader!.addStyle("pointer-events: none;")
+
+rem ----------------------------------------------------------------------- 'inputs'
+hoursInput! = window!.addInputN(4, 175, 100, 100, 50, $0004$, "00")
+REM hoursInputSpinner! = window!.addInputNSpinner(12, 175, 100, 100, 50, $0004$, "00", 00, 99)
+minutesInput! = window!.addInputN(5, 307, 100, 100, 50, $0004$, "00")
+secondsInput! = window!.addInputN(6, 437.5, 100, 100, 50, $0004$, "00")
+
+REM hoursInput!.focus()
 
 rem 'input - alignment'
 hoursInput!.setAlignment(hoursInput!.ALIGN_CENTER)
+REM hoursInputSpinner!.setAlignment(hoursInputSpinner!.ALIGN_CENTER)
 minutesInput!.setAlignment(minutesInput!.ALIGN_CENTER)
 secondsInput!.setAlignment(secondsInput!.ALIGN_CENTER)
 
 rem 'input - font'
 hoursInput!.setFont(inputFont!)
+REM hoursInputSpinner!.setFont(inputFont!)
 minutesInput!.setFont(inputFont!)
 secondsInput!.setFont(inputFont!)
 
 rem ----------------------------------------------------------------------- 'buttons'
-startButton! = window!.addButton(4,175,180,100,50,"START",$$)
-stopButton! = window!.addButton(5,437.5,180,100,50,"STOP",$$)
-resetButton! = window!.addButton(6,600,0,100,50,"RESET",$$)
+startButton! = window!.addButton(1,175,180,100,50,"START",$$)
+stopButton! = window!.addButton(2,437.5,180,100,50,"STOP",$$)
+resetButton! = window!.addButton(3,600,0,100,50,"RESET",$$)
 
 stopButton!.setEnabled(0)
 
@@ -73,22 +104,29 @@ startButton!.setBackColor(startButtonColor!)
 stopButton!.setBackColor(stopButtonColor!)
 resetButton!.setOpaque(0)
 
-rem ----------------------------------------------------------------------- 'static text'
-colon1! = window!.addStaticText(7, 286, 103, 10, 50, ":")
-colon2! = window!.addStaticText(8, 418, 103, 10, 50, ":")
-
-colon1!.setFont(colonFont!)
-colon2!.setFont(colonFont!)
-
-hoursHeader! = window!.addStaticText(9, 200, 80, 100, 50, "Hours")
-minutesHeader! = window!.addStaticText(10, 325, 80, 100, 50, "Minutes")
-secondsHeader! = window!.addStaticText(11, 450, 80, 100, 50, "Seconds")
-
-hoursHeader!.setFont(headerFont!)
-minutesHeader!.setFont(headerFont!)
-secondsHeader!.setFont(headerFont!)
-
+rem ----------------------------------------------------------------------- 'additional values & cookies'
 startTime! = 0
+
+if (tc!.getUserProperty("userProperties") = "yes") then
+    previousHours$ = tc!.getUserProperty("hoursRemaining!")
+    previousMinutes$ = tc!.getUserProperty("minutesRemaining!")
+    previousSeconds$ = tc!.getUserProperty("secondsRemaining!")
+    
+    if (NUM(previousHours$) > 0) then 
+        print "previous hours: ", previousHours$
+        hoursInput!.setValue(NUM(previousHours$))
+    endif
+    
+    if (NUM(previousMinutes$) > 0) then
+        print "previous minutes: ", previousMinutes%
+        minutesInput!.setValue(NUM(previousMinutes$))
+    endif
+    
+    if (NUM(previousSeconds$) > 0) then 
+    print "previous seconds: ", previousSeconds$
+        secondsInput!.setValue(NUM(previousSeconds$))
+    endif
+endif
 
 rem ----------------------------------------------------------------------- 'user functions'
 DEF FNConvertTime% (timeRemaining%)    
@@ -112,8 +150,13 @@ DEF FNConvertTime% (timeRemaining%)
     endif
       
     hoursInput!.setValue(hoursRemaining%)
+REM     hoursInputSpinner!.setValue(hoursRemaing%)
     minutesInput!.setValue(minutesRemaining%)
     secondsInput!.setValue(secondsRemaining%)
+    
+        tc!.setUserProperty("hoursRemaining!", STR(hoursRemaining%))
+        tc!.setUserProperty("minutesRemaining!", STR(minutesRemaining%))
+        tc!.setUserProperty("secondsRemaining!", STR(secondsRemaining%))
       
     if (secondsRemaining% <= 10) AND (minutesRemaining% = 0) AND (hoursRemaining% = 0) then
         secondsInput!.setBackColor(stopButtonColor!)
@@ -127,17 +170,19 @@ DEF FNConvertTime% (timeRemaining%)
         timesUpMessage! = msgBox("Time's Up!")
         bbj!.removeTimer(oneSecTimer)
         hoursInput!.setValue(00)
+REM         hoursInputSpinner!.setValue(00)
         minutesInput!.setValue(00)
         secondsInput!.setValue(00)
         startTime! = 0
         stopButton!.setEnabled(0)
         startButton!.setEnabled(1)
         hoursInput!.setEditable(1)
+REM         hoursInputSpinner!.setEditable(1)
         minutesInput!.setEditable(1)
         secondsInput!.setEditable(1)
         secondsInput!.setBackColor(inputBGColor!)
     endif
-      
+    
     RETURN timeRemaining%
  FNEND
 
@@ -160,16 +205,18 @@ stopExitHover:
     stopButton!.setBackColor(stopButtonColor!)
 return
 
-startTimer:
+startTimer:    
     hours! = hoursInput!.getValue()
+REM     hours! = hoursInputSpinner!.getValue()
     minutes! = minutesInput!.getValue()
     seconds! = secondsInput!.getValue()
+    tc!.setUserProperty("userProperties", "yes")
     
     if (hours! > 0) OR (minutes! > 0) OR (seconds! > 0) then
         if (startTime! = 0) then startTime! = TIM
         bbj!.createTimer(oneSecTimer, 1, "calculateTime")
     else
-        noInputMessage! = msgBox("Please enter your desired time")
+        noInputMessage! = msgBox("Please enter your desired time", 0 + 48, "Start timer")
     endif
 return
 
@@ -178,37 +225,43 @@ stopTimer:
     startButton!.setEnabled(1)
     stopButton!.setEnabled(0)
     hoursInput!.setEditable(1)
+REM     hoursInputSpinner!.setEditable(1)
     minutesInput!.setEditable(1)
     secondsInput!.setEditable(1) 
 return
 
 resetTimer:
     hours! = hoursInput!.getValue()
+REM     hours! = hoursInputSpinner!.getValue()
     minutes! = minutesInput!.getValue()
     seconds! = secondsInput!.getValue()
     
     if (hours! = 0) AND (minutes! = 0) AND (seconds! = 0) then 
-        noInputMessage! = msgBox("Please enter your desired time")
+        noInputMessage! = msgBox("Please enter your desired time", 0 + 48, "Reset timer")
     else
-        resetBox! = msgBox("Are you sure you want to reset your timer?", 4, "Reset timer")
+        resetBox! = msgBox("Are you sure you want to reset your timer?", 4 + 32, "Reset timer")
     
         rem return of 6 - YES
         if (resetBox! = 6) then 
             if (stopButton!.isEnabled() = 1) then bbj!.removeTimer(oneSecTimer)
             if (startButton!.isEnabled() = 0) then startButton!.setEnabled(1)
             hoursInput!.setValue(00)
+REM             hoursInputSpinner!.setValue(00)
             minutesInput!.setValue(00)
             secondsInput!.setValue(00)
             startTime! = 0
             stopButton!.setEnabled(0)
             hoursInput!.setEditable(1)
+REM             hoursInputSpinner!.setEditable(1)
             minutesInput!.setEditable(1)
             secondsInput!.setEditable(1)
+            tc!.clearUserProperties()
         endif
     
         rem return of 7 - NO
         if (resetBox! = 7) then
             hoursInput!.setValue(hours!)
+REM             hoursInputSpinner!.setValue(hours!)
             minutesInput!.setValue(minutes!)
             secondsInput!.setValue(seconds!)
         endif
@@ -217,6 +270,7 @@ return
 
 calculateTime:
     hoursInput!.setEditable(0)
+REM     hoursInputSpinner!.setEditable(0)
     minutesInput!.setEditable(0)
     secondsInput!.setEditable(0)
     
@@ -224,6 +278,7 @@ calculateTime:
     startButton!.setEnabled(0)
     
     hours% = hoursInput!.getValue()
+REM     hours% = hoursInputSpinner!.getValue()
     minutes% = minutesInput!.getValue()
     seconds% = secondsInput!.getValue()
     
@@ -239,5 +294,9 @@ calculateTime:
     calculateTime! = FNConvertTime%(timeRemaining%)
 return
 
+ERR_HANDLER_NO_USER_PROPERTIES:
+    tc!.setUserProperty("userProperties", "no") 
+retry
+    
 eoj:
 release
