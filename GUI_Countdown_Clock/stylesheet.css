@@ -1,0 +1,11 @@
+.dwc-btn {
+	margin-top: 20px;
+	
+}
+
+.BBjInputN::part(label) {
+	font-family: arial;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: center;
+}

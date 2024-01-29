@@ -9,6 +9,14 @@ open (sysgui)"X0"
 bbj! = BBjAPI()
 sysgui! = bbj!.getSysGui()
 tc! = bbj!.getThinClient()
+web! = bbj!.getWebManager()
+dwcInfo! = INFO(3,6)
+
+if (dwcInfo! = "6") then
+    cssFilePath! = dsk("") + dir("") + "stylesheet.css"
+    css! = java.nio.file.Files.readAllBytes(java.nio.file.Path.of(cssFilePath!))
+    web!.injectStyle(css!, 0, "id=my_custom_css") 
+endif
 
 title$ = "GUI Countdown Timer"
 
@@ -32,15 +40,17 @@ stopButtonHoverColor! = sysgui!.makeColor(212, 126, 87)
 inputBGColor! = sysgui!.makeColor(255, 255, 255)
 
 rem ----------------------------------------------------------------------- 'static text'
-colon1! = window!.addStaticText(7, 286, 103, 10, 50, ":")
-colon2! = window!.addStaticText(8, 418, 103, 10, 50, ":")
+if (dwcInfo! = "5") then
+    colon1! = window!.addStaticText(7, 286, 103, 10, 50, ":")
+    colon2! = window!.addStaticText(8, 418, 103, 10, 50, ":")
+    
+    colon1!.setFont(colonFont!)
+    colon2!.setFont(colonFont!)
 
-colon1!.setFont(colonFont!)
-colon2!.setFont(colonFont!)
-
-hoursHeader! = window!.addStaticText(9, 200, 80, 100, 50, "Hours")
-minutesHeader! = window!.addStaticText(10, 325, 80, 100, 50, "Minutes")
-secondsHeader! = window!.addStaticText(11, 450, 80, 100, 50, "Seconds")
+rem 'BUI'    
+    hoursHeader! = window!.addStaticText(9, 200, 80, 100, 50, "Hours")
+    minutesHeader! = window!.addStaticText(10, 325, 80, 100, 50, "Minutes")
+    secondsHeader! = window!.addStaticText(11, 450, 80, 100, 50, "Seconds")
 
 hoursHeader!.setFont(headerFont!)
 minutesHeader!.setFont(headerFont!)
@@ -56,12 +66,15 @@ secondsHeader!.setOpaque(0)
 hoursHeader!.addStyle("pointer-events: none;")
 minutesHeader!.addStyle("pointer-events: none;")
 secondsHeader!.addStyle("pointer-events: none;")
+endif
 
 rem ----------------------------------------------------------------------- 'inputs'
+
 hoursInput! = window!.addInputN(4, 175, 100, 100, 50, $0004$, "00")
 REM hoursInputSpinner! = window!.addInputNSpinner(12, 175, 100, 100, 50, $0004$, "00", 00, 99)
 minutesInput! = window!.addInputN(5, 307, 100, 100, 50, $0004$, "00")
 secondsInput! = window!.addInputN(6, 437.5, 100, 100, 50, $0004$, "00")
+
 
 rem 'input - alignment'
 hoursInput!.setAlignment(hoursInput!.ALIGN_CENTER)
@@ -74,6 +87,13 @@ hoursInput!.setFont(inputFont!)
 REM hoursInputSpinner!.setFont(inputFont!)
 minutesInput!.setFont(inputFont!)
 secondsInput!.setFont(inputFont!)
+
+REM 'DWC'
+if (dwcInfo! = "6") then
+    hoursInput!.setAttribute("label", "Hours")
+    minutesInput!.setAttribute("label", "Minutes")
+    secondsInput!.setAttribute("label", "Seconds") 
+endif
 
 rem ----------------------------------------------------------------------- 'buttons'
 startButton! = window!.addButton(1,175,180,100,50,"START",$$)
@@ -101,6 +121,11 @@ stopButton!.setNoEdge(1)
 startButton!.setBackColor(startButtonColor!)
 stopButton!.setBackColor(stopButtonColor!)
 resetButton!.setOpaque(0)
+
+if (dwcInfo! = "6") then
+    startButton!.addClass("dwc-btn")
+    stopButton!.addClass("dwc-btn")
+endif
 
 rem ----------------------------------------------------------------------- 'additional values & cookies'
 startTime! = 0
